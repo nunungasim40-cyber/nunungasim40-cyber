@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi Guru Piket</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .timer-running {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { background-color: #fef2f2; }
+            50% { background-color: #fee2e2; }
+            100% { background-color: #fef2f2; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-700 mb-2">
+                <i class="fas fa-clipboard-list mr-2"></i>📋 Absensi Guru Piket
+            </h1>
+            <p class="text-gray-600">Sistem pencatatan kehadiran siswa keluar dan masuk kelas</p>
+        </header>
+
+        <!-- Form Input Siswa -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Tambah Siswa</h2>
+            <form id="studentForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="studentName" class="block text-sm font-medium text-gray-700 mb-1">Nama Siswa</label>
+                    <input type="text" id="studentName" required 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+                <div>
+                    <label for="studentClass" class="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
+                    <input type="text" id="studentClass" required 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" 
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-0.5">
+                        <i class="fas fa-plus mr-2"></i>Tambah Siswa
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabel Absensi -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelas</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jam Keluar</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jam Masuk</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lama di Luar</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTable" class="bg-white divide-y divide-gray-200">
+                        <!-- Data akan dimasukkan melalui JavaScript -->
+                    </tbody>
+                </table>
+                <div id="emptyState" class="text-center py-12">
+                    <i class="fas fa-clipboard-list text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">Belum ada data absensi. Tambahkan siswa terlebih dahulu.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data siswa dan absensi
+        let students = [];
+        let timers = {};
+
+        // Format waktu
+        function formatTime(date) {
+            return date.toLocaleTimeString('id-ID', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        // Format durasi
+        function formatDuration(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Tambah siswa baru
+        document.getElementById('studentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('studentName').value.trim();
+            const className = document.getElementById('studentClass').value.trim();
+            
+            if (name && className) {
+                const student = {
+                    id: Date.now(),
+                    name: name,
+                    class: className,
+                    timeOut: null,
+                    timeIn: null,
+                    duration: 0,
+                    timerRunning: false
+                };
+                
+                students.push(student);
+                renderTable();
+                
+                // Reset form
+                document.getElementById('studentForm').reset();
+                document.getElementById('studentName').focus();
+            }
+        });
+
+        // Keluar
+        function timeOut(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (student) {
+                student.timeOut = new Date();
+                student.timeIn = null;
+                student.duration = 0;
+                student.timerRunning = true;
+                
+                // Mulai timer
+                startTimer(studentId);
+                renderTable();
+            }
+        }
+
+        // Masuk
+        function timeIn(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (student && student.timerRunning) {
+                student.timeIn = new Date();
+                student.timerRunning = false;
+                
+                // Hentikan timer
+                stopTimer(studentId);
+                renderTable();
+            }
+        }
+
+        // Hapus siswa
+        function removeStudent(studentId) {
+            students = students.filter(s => s.id !== studentId);
+            stopTimer(studentId);
+            renderTable();
+        }
+
+        // Mulai timer
+        function startTimer(studentId) {
+            // Hentikan timer sebelumnya jika ada
+            stopTimer(studentId);
+            
+            // Mulai timer baru
+            timers[studentId] = setInterval(() => {
+                const student = students.find(s => s.id === studentId);
+                if (student && student.timerRunning) {
+                    const now = new Date();
+                    student.duration = Math.floor((now - student.timeOut) / 1000);
+                    updateTimerDisplay(studentId);
+                }
+            }, 1000);
+        }
+
+        // Hentikan timer
+        function stopTimer(studentId) {
+            if (timers[studentId]) {
+                clearInterval(timers[studentId]);
+                delete timers[studentId];
+            }
+        }
+
+        // Update tampilan timer
+        function updateTimerDisplay(studentId) {
+            const timerCell = document.getElementById(`timer-${studentId}`);
+            if (timerCell) {
+                const student = students.find(s => s.id === studentId);
+                if (student) {
+                    timerCell.textContent = formatDuration(student.duration);
+                }
+            }
+        }
+
+        // Render tabel
+        function renderTable() {
+            const tableBody = document.getElementById('attendanceTable');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (students.length === 0) {
+                tableBody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            
+            tableBody.innerHTML = students.map(student => {
+                const timeOutStr = student.timeOut ? formatTime(student.timeOut) : '-';
+                const timeInStr = student.timeIn ? formatTime(student.timeIn) : '-';
+                const durationStr = student.duration > 0 ? formatDuration(student.duration) : '-';
+                
+                return `
+                    <tr id="row-${student.id}" class="${student.timerRunning ? 'timer-running' : ''}">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${student.name}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">${student.class}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">${timeOutStr}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">${timeInStr}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div id="timer-${student.id}" class="text-sm font-medium ${student.timerRunning ? 'text-red-600' : 'text-gray-900'}">${durationStr}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            ${!student.timeOut || student.timeIn ? 
+                                `<button onclick="timeOut(${student.id})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg mr-2 transition duration-300 ease-in-out">
+                                    <i class="fas fa-door-open mr-1"></i>Keluar
+                                </button>` : 
+                                `<button onclick="timeIn(${student.id})" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg mr-2 transition duration-300 ease-in-out">
+                                    <i class="fas fa-door-closed mr-1"></i>Masuk
+                                </button>`
+                            }
+                            <button onclick="removeStudent(${student.id})" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-lg transition duration-300 ease-in-out">
+                                <i class="fas fa-trash mr-1"></i>Hapus
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTable();
+        });
+    </script>
+</body>
+</html>
