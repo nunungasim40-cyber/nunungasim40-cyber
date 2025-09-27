@@ -3,257 +3,1854 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Guru Piket</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome untuk ikon -->
+    <title>Sistem Data Tahanan - Kejaksaan Negeri Gowa Malino</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .timer-running {
-            animation: pulse 1.5s infinite;
+        :root {
+            --primary: #1a4d8f;
+            --primary-dark: #0d3a73;
+            --primary-light: #2a6bc5;
+            --secondary: #d4af37;
+            --secondary-dark: #b8941f;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray: #6c757d;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --border: #dee2e6;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+            --transition: all 0.3s ease;
         }
         
-        @keyframes pulse {
-            0% { background-color: #fef2f2; }
-            50% { background-color: #fee2e2; }
-            100% { background-color: #fef2f2; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--secondary);
+        }
+        
+        .logo-text h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .logo-text p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 15px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        nav a:hover, nav a.active {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            color: var(--dark);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .btn-info {
+            background-color: var(--info);
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background-color: #138496;
+            transform: translateY(-2px);
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+        
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2rem 0;
+        }
+        
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .card-header h2 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 77, 143, 0.1);
+        }
+        
+        /* Dashboard Stats */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+        
+        .stat-info {
+            flex: 1;
+        }
+        
+        .stat-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .stat-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* Table Styles */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .table th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* Alert Styles */
+        .alert {
+            padding: 12px 15px;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 2rem 0;
+            margin-top: auto;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+        
+        .footer-logo {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .modal-header h3 {
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+        
+        .close-modal:hover {
+            color: var(--dark);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .file-upload:hover {
+            border-color: var(--primary);
+            background-color: #f8f9fa;
+        }
+        
+        .file-upload i {
+            font-size: 2.5rem;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+        
+        /* Search Results */
+        .search-results {
+            margin-top: 2rem;
+        }
+        
+        .prisoner-card {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .prisoner-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .prisoner-photo {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            border-radius: var(--radius);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 3rem;
+            flex-shrink: 0;
+        }
+        
+        .prisoner-info {
+            flex: 1;
+        }
+        
+        .prisoner-info h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .prisoner-info p {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .prisoner-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* Badge Styles */
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        /* Login Page */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70vh;
+        }
+        
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        /* Drive File Display */
+        .drive-file {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: var(--radius);
+            margin-top: 10px;
+        }
+        
+        .drive-file i {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            height: 400px;
+            position: relative;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .prisoner-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .prisoner-photo {
+                align-self: center;
+            }
+            
+            .prisoner-info p {
+                justify-content: center;
+            }
+            
+            .table th, .table td {
+                padding: 8px 10px;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+            
+            .modal-content {
+                margin: 0 10px;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .auth-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .auth-buttons .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .prisoner-actions {
+                flex-direction: column;
+            }
+            
+            .prisoner-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                text-align: center;
+            }
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Search and Filter */
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .search-box input {
+            padding-left: 40px;
+        }
+        
+        .filter-select {
+            min-width: 150px;
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 992px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .admin-only {
+            display: none;
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-        <!-- Header -->
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-blue-700 mb-2">
-                <i class="fas fa-clipboard-list mr-2"></i>📋 Absensi Guru Piket
-            </h1>
-            <p class="text-gray-600">Sistem pencatatan kehadiran siswa keluar dan masuk kelas</p>
-        </header>
-
-        <!-- Form Input Siswa -->
-        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Tambah Siswa</h2>
-            <form id="studentForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label for="studentName" class="block text-sm font-medium text-gray-700 mb-1">Nama Siswa</label>
-                    <input type="text" id="studentName" required 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">⚖️</div>
+                    <div class="logo-text">
+                        <h1>Kejaksaan Negeri Gowa</h1>
+                        <p>Cabang Malino - Sistem Data Tahanan</p>
+                    </div>
                 </div>
-                <div>
-                    <label for="studentClass" class="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
-                    <input type="text" id="studentClass" required 
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                </div>
-                <div class="flex items-end">
-                    <button type="submit" 
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-0.5">
-                        <i class="fas fa-plus mr-2"></i>Tambah Siswa
-                    </button>
-                </div>
-            </form>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-page="dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a></li>
+                        <li><a href="#" class="nav-link" data-page="search"><i class="fas fa-search"></i> Cari Tahanan</a></li>
+                        <li class="admin-only"><a href="#" class="nav-link" data-page="prisoners"><i class="fas fa-users"></i> Data Tahanan</a></li>
+                        <li class="admin-only"><a href="#" class="nav-link" data-page="reports"><i class="fas fa-file-alt"></i> Laporan</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    </div>
+            </div>
         </div>
-
-        <!-- Tabel Absensi -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelas</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jam Keluar</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jam Masuk</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lama di Luar</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="attendanceTable" class="bg-white divide-y divide-gray-200">
-                        <!-- Data akan dimasukkan melalui JavaScript -->
-                    </tbody>
-                </table>
-                <div id="emptyState" class="text-center py-12">
-                    <i class="fas fa-clipboard-list text-4xl text-gray-300 mb-4"></i>
-                    <p class="text-gray-500">Belum ada data absensi. Tambahkan siswa terlebih dahulu.</p>
+    </header>
+    
+    <main>
+        <div class="container">
+            <div class="page active" id="dashboard-page">
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--primary);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalPrisoners">0</h3>
+                            <p>Total Tahanan</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--danger);">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="detainedPrisoners">0</h3>
+                            <p>Dalam Tahanan</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--success);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="releasedPrisoners">0</h3>
+                            <p>Sudah Bebas</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--warning);">
+                            <i class="fas fa-gavel"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="trialPrisoners">0</h3>
+                            <p>Proses Hukum</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="chart-container">
+                        <h3 style="margin-bottom: 1rem; color: var(--primary);">Statistik Tahanan per Bulan (12 Bulan Terakhir)</h3>
+                        <canvas id="prisonerChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 style="margin-bottom: 1rem; color: var(--primary);">Distribusi Kasus</h3>
+                        <canvas id="caseChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-list"></i> Tahanan Terbaru</h2>
+                        <a href="#" class="btn btn-primary admin-only" id="viewAllPrisoners">Lihat Semua</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table" id="recentPrisonersTable">
+                            <thead>
+                                <tr>
+                                    <th>NIK</th>
+                                    <th>Nama Lengkap</th>
+                                    <th>Kasus</th>
+                                    <th>Tanggal Masuk</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentPrisonersBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page" id="search-page">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-search"></i> Cari Data Tahanan</h2>
+                    </div>
+                    <form id="searchForm">
+                        <div class="form-group">
+                            <label for="nik"><i class="fas fa-id-card"></i> Nomor Induk Kependudukan (NIK)</label>
+                            <input type="text" id="nik" class="form-control" placeholder="Masukkan NIK tahanan" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Cari Data</button>
+                    </form>
+                </div>
+                
+                <div id="searchResults" class="search-results">
+                    </div>
+            </div>
+            
+            <div class="page" id="prisoners-page">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-users"></i> Manajemen Data Tahanan</h2>
+                        <button class="btn btn-success" id="addPrisonerBtn"><i class="fas fa-plus"></i> Tambah Tahanan</button>
+                    </div>
+                    
+                    <div class="search-filter">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchPrisoner" class="form-control" placeholder="Cari berdasarkan nama atau NIK...">
+                        </div>
+                        <select id="statusFilter" class="form-control filter-select">
+                            <option value="">Semua Status</option>
+                            <option value="Ditahan">Ditahan</option>
+                            <option value="Bebas">Bebas</option>
+                            <option value="Proses Hukum">Proses Hukum</option>
+                        </select>
+                        <select id="caseFilter" class="form-control filter-select">
+                            <option value="">Semua Kasus</option>
+                            </select>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table" id="prisonersTable">
+                            <thead>
+                                <tr>
+                                    <th>NIK</th>
+                                    <th>Nama Lengkap</th>
+                                    <th>Tanggal Lahir</th>
+                                    <th>Jenis Kelamin</th>
+                                    <th>Kasus</th>
+                                    <th>Status</th>
+                                    <th>Tanggal Masuk</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prisonersTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                        <div id="paginationInfo"></div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-outline btn-sm" id="prevPage">Sebelumnya</button>
+                            <button class="btn btn-outline btn-sm" id="nextPage">Selanjutnya</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page" id="reports-page">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-file-alt"></i> Laporan dan Statistik</h2>
+                    </div>
+                    
+                    <div class="tabs">
+                        <div class="tab active" data-tab="summary">Ringkasan</div>
+                        <div class="tab" data-tab="monthly">Bulanan</div>
+                        <div class="tab" data-tab="cases">Berdasarkan Kasus</div>
+                    </div>
+                    
+                    <div class="tab-content active" id="summary-tab">
+                        <div class="stats-container">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: var(--primary);">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3 id="avgDetention">0</h3>
+                                    <p>Rata-rata Masa Tahanan (hari)</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: var(--info);">
+                                    <i class="fas fa-male"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3 id="malePrisoners">0</h3>
+                                    <p>Tahanan Laki-laki</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: var(--primary-light);">
+                                    <i class="fas fa-female"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3 id="femalePrisoners">0</h3>
+                                    <p>Tahanan Perempuan</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: var(--warning);">
+                                    <i class="fas fa-balance-scale"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <h3 id="topCase">-</h3>
+                                    <p>Kasus Terbanyak</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <h3 style="margin-bottom: 1rem; color: var(--primary);">Trend Tahanan per Tahun</h3>
+                            <canvas id="yearlyChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="monthly-tab">
+                        <div class="form-group">
+                            <label for="reportYear">Pilih Tahun:</label>
+                            <select id="reportYear" class="form-control" style="max-width: 200px;">
+                                </select>
+                        </div>
+                        <div class="chart-container">
+                            <h3 style="margin-bottom: 1rem; color: var(--primary);">Laporan Bulanan</h3>
+                            <canvas id="monthlyReportChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="cases-tab">
+                        <div class="chart-container">
+                            <h3 style="margin-bottom: 1rem; color: var(--primary);">Distribusi Kasus Rinci</h3>
+                            <canvas id="casesChart"></canvas>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Jenis Kasus</th>
+                                        <th>Jumlah Tahanan</th>
+                                        <th>Persentase</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="casesTableBody">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">⚖️</div>
+                <p>Kejaksaan Negeri Gowa Cabang Malino</p>
+                <p>Jl. Pendidikan No. 123, Malino, Gowa, Sulawesi Selatan</p>
+                <p>Email: kejari.gowamalino@kejaksaan.go.id | Telp: (0411) 123456</p>
+                <p>&copy; 2025 Sistem Data Tahanan. Semua hak dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-sign-in-alt"></i> Login Administrator</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="loginError" class="alert alert-danger hidden"></div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username"><i class="fas fa-user"></i> Username</label>
+                        <input type="text" id="username" class="form-control" placeholder="Coba: admin" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password"><i class="fas fa-lock"></i> Password</label>
+                        <input type="password" id="password" class="form-control" placeholder="Coba: password123" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
+    
+    <div class="modal" id="prisonerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="prisonerModalTitle"><i class="fas fa-user-plus"></i> Tambah Data Tahanan</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="prisonerForm">
+                    <input type="hidden" id="prisonerId">
+                    <div class="form-group">
+                        <label for="modalNik"><i class="fas fa-id-card"></i> NIK</label>
+                        <input type="text" id="modalNik" class="form-control" required pattern="\d{16}" title="NIK harus terdiri dari 16 digit angka.">
+                    </div>
+                    <div class="form-group">
+                        <label for="modalName"><i class="fas fa-user"></i> Nama Lengkap</label>
+                        <input type="text" id="modalName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalBirthDate"><i class="fas fa-calendar-alt"></i> Tanggal Lahir</label>
+                        <input type="date" id="modalBirthDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-venus-mars"></i> Jenis Kelamin</label>
+                        <div style="display: flex; gap: 15px; margin-top: 10px;">
+                            <label style="display: flex; align-items: center; gap: 5px; font-weight: 400;">
+                                <input type="radio" name="gender" value="L" required> Laki-laki
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 5px; font-weight: 400;">
+                                <input type="radio" name="gender" value="P"> Perempuan
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalAddress"><i class="fas fa-home"></i> Alamat</label>
+                        <textarea id="modalAddress" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalCase"><i class="fas fa-gavel"></i> Kasus</label>
+                        <input type="text" id="modalCase" class="form-control" required list="caseOptions">
+                        <datalist id="caseOptions">
+                            </datalist>
+                    </div>
+                     <div class="form-group">
+                        <label for="modalEntryDate"><i class="fas fa-calendar-plus"></i> Tanggal Masuk</label>
+                        <input type="date" id="modalEntryDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalStatus"><i class="fas fa-info-circle"></i> Status</label>
+                        <select id="modalStatus" class="form-control" required>
+                            <option value="Ditahan">Ditahan</option>
+                            <option value="Proses Hukum">Proses Hukum</option>
+                            <option value="Bebas">Bebas</option>
+                        </select>
+                    </div>
+                    <div class="form-group hidden" id="releaseDateGroup">
+                        <label for="modalReleaseDate"><i class="fas fa-calendar-check"></i> Tanggal Bebas</label>
+                        <input type="date" id="modalReleaseDate" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-success" style="width: 100%;"><i class="fas fa-save"></i> Simpan Data</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+<script>
+document.addEventListener('DOMContentLoaded', () => {
 
-    <script>
-        // Data siswa dan absensi
-        let students = [];
-        let timers = {};
+    // =================================================================================
+    // DUMMY DATA & STATE MANAGEMENT
+    // =================================================================================
+    
+    // In a real application, this data would come from a server/database.
+    let prisoners = [
+        { id: 1, nik: "7306101234560001", name: "Budi Santoso", birthDate: "1985-05-15", gender: "L", address: "Jl. Merdeka No. 10, Gowa", caseType: "Narkotika", entryDate: "2024-01-20", status: "Ditahan", releaseDate: null },
+        { id: 2, nik: "7306102345670002", name: "Siti Aminah", birthDate: "1992-09-22", gender: "P", address: "Jl. Pahlawan No. 5, Malino", caseType: "Pencurian", entryDate: "2023-11-05", status: "Bebas", releaseDate: "2024-05-05" },
+        { id: 3, nik: "7306103456780003", name: "Agus Wijaya", birthDate: "1988-02-10", gender: "L", address: "Jl. Sudirman No. 1, Gowa", caseType: "Penggelapan", entryDate: "2024-03-12", status: "Proses Hukum", releaseDate: null },
+        { id: 4, nik: "7306104567890004", name: "Dewi Lestari", birthDate: "1995-07-30", gender: "P", address: "Jl. Kartini No. 8, Malino", caseType: "Penipuan", entryDate: "2024-06-01", status: "Ditahan", releaseDate: null },
+        { id: 5, nik: "7306105678900005", name: "Eko Prasetyo", birthDate: "1980-12-01", gender: "L", address: "Jl. Ahmad Yani No. 15, Gowa", caseType: "Narkotika", entryDate: "2023-08-15", status: "Bebas", releaseDate: "2024-08-15" },
+        { id: 6, nik: "7306106789010006", name: "Fitri Handayani", birthDate: "1998-04-25", gender: "P", address: "Jl. Melati No. 3, Malino", caseType: "Pencurian", entryDate: "2024-08-10", status: "Ditahan", releaseDate: null },
+        { id: 7, nik: "7306107890120007", name: "Gunawan", birthDate: "1975-11-18", gender: "L", address: "Jl. Mawar No. 22, Gowa", caseType: "Korupsi", entryDate: "2022-05-20", status: "Proses Hukum", releaseDate: null },
+        { id: 8, nik: "7306108901230008", name: "Hesti Purwanti", birthDate: "1991-03-14", gender: "P", address: "Jl. Anggrek No. 7, Malino", caseType: "Narkotika", entryDate: "2024-09-02", status: "Ditahan", releaseDate: null },
+        { id: 9, nik: "7306109012340009", name: "Irfan Hakim", birthDate: "1989-08-08", gender: "L", address: "Jl. Dahlia No. 11, Gowa", caseType: "Penganiayaan", entryDate: "2024-07-22", status: "Proses Hukum", releaseDate: null },
+        { id: 10, nik: "7306100123450010", name: "Joko Susilo", birthDate: "1993-01-05", gender: "L", address: "Jl. Flamboyan No. 9, Malino", caseType: "Pencurian", entryDate: "2023-02-18", status: "Bebas", releaseDate: "2023-10-18" },
+        { id: 11, nik: "7306101234560011", name: "Rizky Amelia", birthDate: "1999-06-30", gender: "P", address: "Jl. Cendrawasih No. 1, Gowa", caseType: "Penipuan", entryDate: "2024-09-15", status: "Ditahan", releaseDate: null },
+        { id: 12, nik: "7306102345670012", name: "Fajar Nugraha", birthDate: "1982-10-11", gender: "L", address: "Jl. Elang No. 4, Malino", caseType: "Narkotika", entryDate: "2021-12-01", status: "Bebas", releaseDate: "2024-12-01" },
+    ];
 
-        // Format waktu
-        function formatTime(date) {
-            return date.toLocaleTimeString('id-ID', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                second: '2-digit'
+    let isLoggedIn = false;
+    let currentPage = 1;
+    const rowsPerPage = 5;
+    let charts = {};
+
+    // =================================================================================
+    // SELECTORS
+    // =================================================================================
+    const navLinks = document.querySelectorAll('.nav-link');
+    const pages = document.querySelectorAll('.page');
+    const loginModal = document.getElementById('loginModal');
+    const prisonerModal = document.getElementById('prisonerModal');
+    const closeModals = document.querySelectorAll('.close-modal');
+    const authButtonsContainer = document.querySelector('.auth-buttons');
+    const adminOnlyElements = document.querySelectorAll('.admin-only');
+
+    // =================================================================================
+    // CORE FUNCTIONS
+    // =================================================================================
+    
+    /** Initializes the application */
+    const init = () => {
+        updateAuthStateUI();
+        setupEventListeners();
+        showPage('dashboard');
+        populateCaseFilters();
+    };
+
+    /** Updates the entire UI based on login state */
+    const updateAuthStateUI = () => {
+        renderAuthButtons();
+        if (isLoggedIn) {
+            adminOnlyElements.forEach(el => el.style.display = 'inline-block');
+        } else {
+            adminOnlyElements.forEach(el => el.style.display = 'none');
+            // If on an admin page when logging out, redirect to dashboard
+            const activeAdminPage = document.querySelector('.page.active.admin-only');
+            if(activeAdminPage) showPage('dashboard');
+        }
+    };
+    
+    /** Renders login or logout button */
+    const renderAuthButtons = () => {
+        authButtonsContainer.innerHTML = '';
+        if (isLoggedIn) {
+            const logoutButton = document.createElement('button');
+            logoutButton.className = 'btn btn-danger';
+            logoutButton.id = 'logoutBtn';
+            logoutButton.innerHTML = `<i class="fas fa-sign-out-alt"></i> Logout`;
+            logoutButton.addEventListener('click', handleLogout);
+            authButtonsContainer.appendChild(logoutButton);
+        } else {
+            const loginButton = document.createElement('button');
+            loginButton.className = 'btn btn-outline';
+            loginButton.id = 'loginBtn';
+            loginButton.innerHTML = `<i class="fas fa-sign-in-alt"></i> Login Admin`;
+            loginButton.addEventListener('click', () => showModal(loginModal));
+            authButtonsContainer.appendChild(loginButton);
+        }
+    };
+
+    /** Handles page navigation */
+    const showPage = (pageId) => {
+        pages.forEach(page => page.classList.remove('active'));
+        document.getElementById(`${pageId}-page`).classList.add('active');
+        
+        navLinks.forEach(link => link.classList.remove('active'));
+        document.querySelector(`.nav-link[data-page="${pageId}"]`).classList.add('active');
+
+        // Refresh data when navigating to a page
+        if (pageId === 'dashboard') renderDashboard();
+        if (pageId === 'prisoners' && isLoggedIn) renderPrisonersTable();
+        if (pageId === 'reports' && isLoggedIn) renderReportsPage();
+        if (pageId === 'search') {
+           document.getElementById('searchForm').reset();
+           document.getElementById('searchResults').innerHTML = '';
+        }
+    };
+
+    /** Shows a modal dialog */
+    const showModal = (modal) => modal.classList.add('active');
+
+    /** Hides a modal dialog */
+    const hideModal = (modal) => modal.classList.remove('active');
+    
+    /** Formats date string to DD-MM-YYYY */
+    const formatDate = (dateString) => {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    };
+
+    /** Creates a status badge */
+    const createStatusBadge = (status) => {
+        let badgeClass = '';
+        switch (status) {
+            case 'Ditahan': badgeClass = 'badge-danger'; break;
+            case 'Bebas': badgeClass = 'badge-success'; break;
+            case 'Proses Hukum': badgeClass = 'badge-warning'; break;
+            default: badgeClass = 'badge-info';
+        }
+        return `<span class="badge ${badgeClass}">${status}</span>`;
+    };
+    
+    /** Populates case type dropdowns */
+    const populateCaseFilters = () => {
+        const caseTypes = [...new Set(prisoners.map(p => p.caseType))].sort();
+        const caseFilter = document.getElementById('caseFilter');
+        const caseOptionsDatalist = document.getElementById('caseOptions');
+        
+        caseFilter.innerHTML = '<option value="">Semua Kasus</option>';
+        caseOptionsDatalist.innerHTML = '';
+
+        caseTypes.forEach(caseType => {
+            caseFilter.innerHTML += `<option value="${caseType}">${caseType}</option>`;
+            caseOptionsDatalist.innerHTML += `<option value="${caseType}">`;
+        });
+    };
+    
+    // =================================================================================
+    // EVENT HANDLERS
+    // =================================================================================
+    
+    /** Sets up all event listeners */
+    const setupEventListeners = () => {
+        // Navigation
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageId = link.getAttribute('data-page');
+                // Prevent access to admin pages if not logged in
+                if (link.parentElement.classList.contains('admin-only') && !isLoggedIn) {
+                    showModal(loginModal);
+                    return;
+                }
+                showPage(pageId);
             });
-        }
-
-        // Format durasi
-        function formatDuration(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        // Tambah siswa baru
-        document.getElementById('studentForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('studentName').value.trim();
-            const className = document.getElementById('studentClass').value.trim();
-            
-            if (name && className) {
-                const student = {
-                    id: Date.now(),
-                    name: name,
-                    class: className,
-                    timeOut: null,
-                    timeIn: null,
-                    duration: 0,
-                    timerRunning: false
-                };
-                
-                students.push(student);
-                renderTable();
-                
-                // Reset form
-                document.getElementById('studentForm').reset();
-                document.getElementById('studentName').focus();
-            }
         });
 
-        // Keluar
-        function timeOut(studentId) {
-            const student = students.find(s => s.id === studentId);
-            if (student) {
-                student.timeOut = new Date();
-                student.timeIn = null;
-                student.duration = 0;
-                student.timerRunning = true;
+        // Modals
+        closeModals.forEach(btn => btn.addEventListener('click', () => {
+            hideModal(loginModal);
+            hideModal(prisonerModal);
+        }));
+        
+        window.addEventListener('click', (e) => {
+           if (e.target === loginModal) hideModal(loginModal);
+           if (e.target === prisonerModal) hideModal(prisonerModal);
+        });
+
+        // Forms
+        document.getElementById('loginForm').addEventListener('submit', handleLogin);
+        document.getElementById('searchForm').addEventListener('submit', handleSearch);
+        document.getElementById('prisonerForm').addEventListener('submit', handlePrisonerFormSubmit);
+
+        // Buttons
+        document.getElementById('addPrisonerBtn').addEventListener('click', openAddPrisonerModal);
+        document.getElementById('viewAllPrisoners').addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('prisoners');
+        });
+        
+        // Filters
+        document.getElementById('searchPrisoner').addEventListener('input', () => { currentPage = 1; renderPrisonersTable(); });
+        document.getElementById('statusFilter').addEventListener('change', () => { currentPage = 1; renderPrisonersTable(); });
+        document.getElementById('caseFilter').addEventListener('change', () => { currentPage = 1; renderPrisonersTable(); });
+        
+        // Pagination
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPrisonersTable();
+            }
+        });
+        document.getElementById('nextPage').addEventListener('click', () => {
+             const { totalPages } = getFilteredPrisoners();
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderPrisonersTable();
+            }
+        });
+        
+        // Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
                 
-                // Mulai timer
-                startTimer(studentId);
-                renderTable();
-            }
-        }
-
-        // Masuk
-        function timeIn(studentId) {
-            const student = students.find(s => s.id === studentId);
-            if (student && student.timerRunning) {
-                student.timeIn = new Date();
-                student.timerRunning = false;
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
                 
-                // Hentikan timer
-                stopTimer(studentId);
-                renderTable();
+                // Re-render charts for the active tab to ensure they are displayed correctly
+                 if(tab.dataset.tab === 'monthly') renderMonthlyReportChart();
+                 if(tab.dataset.tab === 'cases') renderCaseDistributionReport();
+            });
+        });
+
+        // Dynamic form elements
+        document.getElementById('modalStatus').addEventListener('change', (e) => {
+            const releaseDateGroup = document.getElementById('releaseDateGroup');
+            if(e.target.value === 'Bebas') {
+                releaseDateGroup.classList.remove('hidden');
+                document.getElementById('modalReleaseDate').required = true;
+            } else {
+                releaseDateGroup.classList.add('hidden');
+                document.getElementById('modalReleaseDate').required = false;
             }
+        });
+    };
+
+    /** Handles login form submission */
+    const handleLogin = (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const loginError = document.getElementById('loginError');
+
+        // Simple validation (replace with actual authentication)
+        if (username === 'admin' && password === 'password123') {
+            isLoggedIn = true;
+            hideModal(loginModal);
+            document.getElementById('loginForm').reset();
+            loginError.classList.add('hidden');
+            updateAuthStateUI();
+            showPage('dashboard');
+        } else {
+            loginError.textContent = 'Username atau password salah.';
+            loginError.classList.remove('hidden');
+        }
+    };
+    
+    /** Handles logout */
+    const handleLogout = () => {
+        isLoggedIn = false;
+        updateAuthStateUI();
+    };
+    
+    /** Handles public search by NIK */
+    const handleSearch = (e) => {
+        e.preventDefault();
+        const nik = document.getElementById('nik').value;
+        const resultContainer = document.getElementById('searchResults');
+        const prisoner = prisoners.find(p => p.nik === nik);
+
+        if (prisoner) {
+            resultContainer.innerHTML = `
+                <div class="prisoner-card">
+                    <div class="prisoner-photo">
+                        <i class="fas ${prisoner.gender === 'L' ? 'fa-male' : 'fa-female'}"></i>
+                    </div>
+                    <div class="prisoner-info">
+                        <h3>${prisoner.name}</h3>
+                        <p><i class="fas fa-id-card"></i> NIK: ${prisoner.nik}</p>
+                        <p><i class="fas fa-gavel"></i> Kasus: ${prisoner.caseType}</p>
+                        <p><i class="fas fa-info-circle"></i> Status Saat Ini: ${createStatusBadge(prisoner.status)}</p>
+                        <p><i class="fas fa-calendar-plus"></i> Tanggal Masuk: ${formatDate(prisoner.entryDate)}</p>
+                        ${prisoner.status === 'Bebas' ? `<p><i class="fas fa-calendar-check"></i> Tanggal Bebas: ${formatDate(prisoner.releaseDate)}</p>` : ''}
+                    </div>
+                </div>
+            `;
+        } else {
+            resultContainer.innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> Data tahanan dengan NIK ${nik} tidak ditemukan.
+                </div>
+            `;
+        }
+    };
+    
+    /** Opens the modal for adding a new prisoner */
+    const openAddPrisonerModal = () => {
+        document.getElementById('prisonerForm').reset();
+        document.getElementById('prisonerModalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Tambah Data Tahanan';
+        document.getElementById('prisonerId').value = '';
+        document.getElementById('releaseDateGroup').classList.add('hidden');
+        document.getElementById('modalReleaseDate').required = false;
+        showModal(prisonerModal);
+    };
+
+    /** Opens the modal for editing an existing prisoner */
+    const openEditPrisonerModal = (id) => {
+        const prisoner = prisoners.find(p => p.id === id);
+        if (!prisoner) return;
+
+        document.getElementById('prisonerForm').reset();
+        document.getElementById('prisonerModalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Data Tahanan';
+        document.getElementById('prisonerId').value = prisoner.id;
+        document.getElementById('modalNik').value = prisoner.nik;
+        document.getElementById('modalName').value = prisoner.name;
+        document.getElementById('modalBirthDate').value = prisoner.birthDate;
+        document.querySelector(`input[name="gender"][value="${prisoner.gender}"]`).checked = true;
+        document.getElementById('modalAddress').value = prisoner.address;
+        document.getElementById('modalCase').value = prisoner.caseType;
+        document.getElementById('modalEntryDate').value = prisoner.entryDate;
+        document.getElementById('modalStatus').value = prisoner.status;
+
+        const releaseDateGroup = document.getElementById('releaseDateGroup');
+        if (prisoner.status === 'Bebas') {
+            releaseDateGroup.classList.remove('hidden');
+            document.getElementById('modalReleaseDate').value = prisoner.releaseDate;
+            document.getElementById('modalReleaseDate').required = true;
+        } else {
+            releaseDateGroup.classList.add('hidden');
+            document.getElementById('modalReleaseDate').value = '';
+            document.getElementById('modalReleaseDate').required = false;
+        }
+        
+        showModal(prisonerModal);
+    };
+    
+    /** Handles the submission of the add/edit prisoner form */
+    const handlePrisonerFormSubmit = (e) => {
+        e.preventDefault();
+        const id = document.getElementById('prisonerId').value;
+        
+        const prisonerData = {
+            nik: document.getElementById('modalNik').value,
+            name: document.getElementById('modalName').value,
+            birthDate: document.getElementById('modalBirthDate').value,
+            gender: document.querySelector('input[name="gender"]:checked').value,
+            address: document.getElementById('modalAddress').value,
+            caseType: document.getElementById('modalCase').value,
+            entryDate: document.getElementById('modalEntryDate').value,
+            status: document.getElementById('modalStatus').value,
+            releaseDate: document.getElementById('modalStatus').value === 'Bebas' ? document.getElementById('modalReleaseDate').value : null
+        };
+
+        if (id) { // Editing existing prisoner
+            const index = prisoners.findIndex(p => p.id == id);
+            prisoners[index] = { ...prisoners[index], ...prisonerData };
+        } else { // Adding new prisoner
+            prisonerData.id = prisoners.length > 0 ? Math.max(...prisoners.map(p => p.id)) + 1 : 1;
+            prisoners.push(prisonerData);
         }
 
-        // Hapus siswa
-        function removeStudent(studentId) {
-            students = students.filter(s => s.id !== studentId);
-            stopTimer(studentId);
-            renderTable();
-        }
+        hideModal(prisonerModal);
+        populateCaseFilters();
+        renderPrisonersTable();
+        renderDashboard(); // Update stats after change
+    };
 
-        // Mulai timer
-        function startTimer(studentId) {
-            // Hentikan timer sebelumnya jika ada
-            stopTimer(studentId);
-            
-            // Mulai timer baru
-            timers[studentId] = setInterval(() => {
-                const student = students.find(s => s.id === studentId);
-                if (student && student.timerRunning) {
-                    const now = new Date();
-                    student.duration = Math.floor((now - student.timeOut) / 1000);
-                    updateTimerDisplay(studentId);
-                }
-            }, 1000);
+    /** Handles prisoner deletion */
+    const handleDeletePrisoner = (id) => {
+        const prisoner = prisoners.find(p => p.id === id);
+        if (confirm(`Apakah Anda yakin ingin menghapus data tahanan ${prisoner.name}?`)) {
+            prisoners = prisoners.filter(p => p.id !== id);
+            renderPrisonersTable();
+            renderDashboard(); // Update stats after change
         }
+    };
 
-        // Hentikan timer
-        function stopTimer(studentId) {
-            if (timers[studentId]) {
-                clearInterval(timers[studentId]);
-                delete timers[studentId];
-            }
-        }
+    // =================================================================================
+    // RENDERING FUNCTIONS
+    // =================================================================================
 
-        // Update tampilan timer
-        function updateTimerDisplay(studentId) {
-            const timerCell = document.getElementById(`timer-${studentId}`);
-            if (timerCell) {
-                const student = students.find(s => s.id === studentId);
-                if (student) {
-                    timerCell.textContent = formatDuration(student.duration);
-                }
-            }
-        }
+    /** Renders all components on the dashboard */
+    const renderDashboard = () => {
+        // Stats
+        document.getElementById('totalPrisoners').textContent = prisoners.length;
+        document.getElementById('detainedPrisoners').textContent = prisoners.filter(p => p.status === 'Ditahan').length;
+        document.getElementById('releasedPrisoners').textContent = prisoners.filter(p => p.status === 'Bebas').length;
+        document.getElementById('trialPrisoners').textContent = prisoners.filter(p => p.status === 'Proses Hukum').length;
 
-        // Render tabel
-        function renderTable() {
-            const tableBody = document.getElementById('attendanceTable');
-            const emptyState = document.getElementById('emptyState');
-            
-            if (students.length === 0) {
-                tableBody.innerHTML = '';
-                emptyState.classList.remove('hidden');
-                return;
-            }
-            
-            emptyState.classList.add('hidden');
-            
-            tableBody.innerHTML = students.map(student => {
-                const timeOutStr = student.timeOut ? formatTime(student.timeOut) : '-';
-                const timeInStr = student.timeIn ? formatTime(student.timeIn) : '-';
-                const durationStr = student.duration > 0 ? formatDuration(student.duration) : '-';
-                
-                return `
-                    <tr id="row-${student.id}" class="${student.timerRunning ? 'timer-running' : ''}">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">${student.name}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500">${student.class}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500">${timeOutStr}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-500">${timeInStr}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div id="timer-${student.id}" class="text-sm font-medium ${student.timerRunning ? 'text-red-600' : 'text-gray-900'}">${durationStr}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            ${!student.timeOut || student.timeIn ? 
-                                `<button onclick="timeOut(${student.id})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg mr-2 transition duration-300 ease-in-out">
-                                    <i class="fas fa-door-open mr-1"></i>Keluar
-                                </button>` : 
-                                `<button onclick="timeIn(${student.id})" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg mr-2 transition duration-300 ease-in-out">
-                                    <i class="fas fa-door-closed mr-1"></i>Masuk
-                                </button>`
-                            }
-                            <button onclick="removeStudent(${student.id})" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-lg transition duration-300 ease-in-out">
-                                <i class="fas fa-trash mr-1"></i>Hapus
-                            </button>
-                        </td>
+        // Recent Prisoners Table
+        const recentPrisoners = [...prisoners].sort((a, b) => new Date(b.entryDate) - new Date(a.entryDate)).slice(0, 5);
+        const recentBody = document.getElementById('recentPrisonersBody');
+        recentBody.innerHTML = '';
+        if(recentPrisoners.length === 0){
+            recentBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Tidak ada data tahanan.</td></tr>`;
+        } else {
+            recentPrisoners.forEach(p => {
+                recentBody.innerHTML += `
+                    <tr>
+                        <td>${p.nik}</td>
+                        <td>${p.name}</td>
+                        <td>${p.caseType}</td>
+                        <td>${formatDate(p.entryDate)}</td>
+                        <td>${createStatusBadge(p.status)}</td>
                     </tr>
                 `;
-            }).join('');
+            });
         }
+        
+        // Charts
+        renderMonthlyEntryChart();
+        renderCaseDistributionChart();
+    };
 
-        // Inisialisasi
-        document.addEventListener('DOMContentLoaded', function() {
-            renderTable();
+    /** Renders the main prisoners table with filtering and pagination */
+    const renderPrisonersTable = () => {
+        const { paginatedData, totalPages, start, end, total } = getFilteredPrisoners();
+        const tableBody = document.getElementById('prisonersTableBody');
+        tableBody.innerHTML = '';
+
+        if (paginatedData.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center;">Tidak ada data yang cocok.</td></tr>`;
+        } else {
+            paginatedData.forEach(p => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${p.nik}</td>
+                    <td>${p.name}</td>
+                    <td>${formatDate(p.birthDate)}</td>
+                    <td>${p.gender === 'L' ? 'Laki-laki' : 'Perempuan'}</td>
+                    <td>${p.caseType}</td>
+                    <td>${createStatusBadge(p.status)}</td>
+                    <td>${formatDate(p.entryDate)}</td>
+                    <td>
+                        <button class="btn btn-info btn-sm edit-btn" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-sm delete-btn" title="Hapus"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                row.querySelector('.edit-btn').addEventListener('click', () => openEditPrisonerModal(p.id));
+                row.querySelector('.delete-btn').addEventListener('click', () => handleDeletePrisoner(p.id));
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Update pagination info
+        document.getElementById('paginationInfo').textContent = `Menampilkan ${start}-${end} dari ${total} data`;
+        document.getElementById('prevPage').disabled = currentPage === 1;
+        document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
+    };
+    
+    /** Filters and paginates prisoner data */
+    const getFilteredPrisoners = () => {
+        const searchTerm = document.getElementById('searchPrisoner').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        const caseFilter = document.getElementById('caseFilter').value;
+
+        const filtered = prisoners.filter(p => {
+            const matchesSearch = p.name.toLowerCase().includes(searchTerm) || p.nik.includes(searchTerm);
+            const matchesStatus = statusFilter ? p.status === statusFilter : true;
+            const matchesCase = caseFilter ? p.caseType === caseFilter : true;
+            return matchesSearch && matchesStatus && matchesCase;
         });
-    </script>
+
+        const totalPages = Math.ceil(filtered.length / rowsPerPage);
+        const start = (currentPage - 1) * rowsPerPage;
+        const paginatedData = filtered.slice(start, start + rowsPerPage);
+        
+        return {
+            paginatedData,
+            totalPages,
+            start: filtered.length > 0 ? start + 1 : 0,
+            end: Math.min(start + rowsPerPage, filtered.length),
+            total: filtered.length
+        };
+    };
+    
+    /** Renders all components on the reports page */
+    const renderReportsPage = () => {
+        renderSummaryReport();
+        populateReportYears();
+        renderMonthlyReportChart();
+        renderCaseDistributionReport();
+    };
+
+    const renderSummaryReport = () => {
+        // Avg detention
+        const released = prisoners.filter(p => p.status === 'Bebas' && p.releaseDate && p.entryDate);
+        let totalDays = 0;
+        if (released.length > 0) {
+            totalDays = released.reduce((acc, p) => {
+                const entry = new Date(p.entryDate);
+                const release = new Date(p.releaseDate);
+                const diffTime = Math.abs(release - entry);
+                return acc + Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            }, 0);
+        }
+        document.getElementById('avgDetention').textContent = released.length > 0 ? (totalDays / released.length).toFixed(1) : 0;
+
+        // Gender
+        document.getElementById('malePrisoners').textContent = prisoners.filter(p => p.gender === 'L').length;
+        document.getElementById('femalePrisoners').textContent = prisoners.filter(p => p.gender === 'P').length;
+
+        // Top Case
+        const caseCounts = prisoners.reduce((acc, p) => {
+            acc[p.caseType] = (acc[p.caseType] || 0) + 1;
+            return acc;
+        }, {});
+        const topCase = Object.keys(caseCounts).length > 0 ? Object.entries(caseCounts).sort((a,b) => b[1] - a[1])[0][0] : '-';
+        document.getElementById('topCase').textContent = topCase;
+        
+        renderYearlyChart();
+    };
+    
+    /** Populates the year dropdown for monthly reports */
+    const populateReportYears = () => {
+        const yearSelect = document.getElementById('reportYear');
+        const years = [...new Set(prisoners.map(p => new Date(p.entryDate).getFullYear()))].sort((a,b) => b-a);
+        yearSelect.innerHTML = '';
+        years.forEach(year => {
+            yearSelect.innerHTML += `<option value="${year}">${year}</option>`;
+        });
+        if(years.length > 0) yearSelect.value = new Date().getFullYear();
+        yearSelect.addEventListener('change', renderMonthlyReportChart);
+    };
+
+    // =================================================================================
+    // CHART FUNCTIONS
+    // =================================================================================
+    
+    /** Generic function to create or update a chart */
+    const createOrUpdateChart = (canvasId, type, data, options) => {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        if (charts[canvasId]) {
+            charts[canvasId].destroy();
+        }
+        charts[canvasId] = new Chart(ctx, { type, data, options });
+    };
+
+    /** Renders the monthly prisoner entry chart on the dashboard */
+    const renderMonthlyEntryChart = () => {
+        const labels = [];
+        const data = [];
+        const now = new Date();
+        
+        for (let i = 11; i >= 0; i--) {
+            const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const monthName = date.toLocaleString('id-ID', { month: 'short' });
+            const year = date.getFullYear();
+            labels.push(`${monthName} ${year}`);
+            
+            const count = prisoners.filter(p => {
+                const entryDate = new Date(p.entryDate);
+                return entryDate.getFullYear() === date.getFullYear() && entryDate.getMonth() === date.getMonth();
+            }).length;
+            data.push(count);
+        }
+        
+        createOrUpdateChart('prisonerChart', 'line', 
+            {
+                labels,
+                datasets: [{
+                    label: 'Tahanan Masuk',
+                    data,
+                    backgroundColor: 'rgba(26, 77, 143, 0.2)',
+                    borderColor: 'rgba(26, 77, 143, 1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            { responsive: true, maintainAspectRatio: false }
+        );
+    };
+
+    /** Renders the case distribution pie chart on the dashboard */
+    const renderCaseDistributionChart = () => {
+        const caseCounts = prisoners.reduce((acc, p) => {
+            acc[p.caseType] = (acc[p.caseType] || 0) + 1;
+            return acc;
+        }, {});
+        
+        const labels = Object.keys(caseCounts);
+        const data = Object.values(caseCounts);
+        
+        createOrUpdateChart('caseChart', 'doughnut', 
+            {
+                labels,
+                datasets: [{
+                    label: 'Distribusi Kasus',
+                    data,
+                    backgroundColor: ['#1a4d8f', '#d4af37', '#dc3545', '#28a745', '#17a2b8', '#6c757d', '#ffc107'],
+                }]
+            },
+            { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        );
+    };
+    
+    /** Renders the yearly trend chart on the reports page */
+    const renderYearlyChart = () => {
+        const yearlyCounts = prisoners.reduce((acc, p) => {
+            const year = new Date(p.entryDate).getFullYear();
+            acc[year] = (acc[year] || 0) + 1;
+            return acc;
+        }, {});
+        
+        const sortedYears = Object.keys(yearlyCounts).sort();
+        const labels = sortedYears;
+        const data = sortedYears.map(year => yearlyCounts[year]);
+        
+        createOrUpdateChart('yearlyChart', 'bar',
+            {
+                labels,
+                datasets: [{
+                    label: 'Jumlah Tahanan per Tahun',
+                    data,
+                    backgroundColor: '#1a4d8f',
+                }]
+            },
+            { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        );
+    };
+    
+    /** Renders the monthly report chart on the reports page */
+    const renderMonthlyReportChart = () => {
+        const selectedYear = document.getElementById('reportYear').value;
+        if(!selectedYear) return;
+
+        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+        const dataIn = Array(12).fill(0);
+        const dataOut = Array(12).fill(0);
+
+        prisoners.filter(p => new Date(p.entryDate).getFullYear() == selectedYear).forEach(p => {
+            const month = new Date(p.entryDate).getMonth();
+            dataIn[month]++;
+        });
+        prisoners.filter(p => p.releaseDate && new Date(p.releaseDate).getFullYear() == selectedYear).forEach(p => {
+            const month = new Date(p.releaseDate).getMonth();
+            dataOut[month]++;
+        });
+        
+        createOrUpdateChart('monthlyReportChart', 'bar', 
+            {
+                labels,
+                datasets: [
+                    { label: 'Tahanan Masuk', data: dataIn, backgroundColor: '#2a6bc5' },
+                    { label: 'Tahanan Bebas', data: dataOut, backgroundColor: '#28a745' }
+                ]
+            },
+            { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+        );
+    };
+
+    /** Renders the case distribution charts and table on the reports page */
+    const renderCaseDistributionReport = () => {
+        const caseCounts = prisoners.reduce((acc, p) => {
+            acc[p.caseType] = (acc[p.caseType] || 0) + 1;
+            return acc;
+        }, {});
+        
+        const sortedCases = Object.entries(caseCounts).sort((a,b) => b[1] - a[1]);
+        const labels = sortedCases.map(c => c[0]);
+        const data = sortedCases.map(c => c[1]);
+        const total = prisoners.length;
+
+        // Render chart
+        createOrUpdateChart('casesChart', 'pie', 
+            {
+                labels,
+                datasets: [{
+                    data,
+                    backgroundColor: ['#1a4d8f', '#d4af37', '#dc3545', '#28a745', '#17a2b8', '#6c757d', '#ffc107', '#0d3a73'],
+                }]
+            },
+            { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'left' } } }
+        );
+        
+        // Render table
+        const tableBody = document.getElementById('casesTableBody');
+        tableBody.innerHTML = '';
+        sortedCases.forEach(([caseType, count]) => {
+            const percentage = total > 0 ? ((count / total) * 100).toFixed(2) : 0;
+            tableBody.innerHTML += `
+                <tr>
+                    <td>${caseType}</td>
+                    <td>${count}</td>
+                    <td>${percentage}%</td>
+                </tr>
+            `;
+        });
+    };
+
+    // =================================================================================
+    // INITIALIZE APP
+    // =================================================================================
+    init();
+
+});
+</script>
+
 </body>
 </html>
